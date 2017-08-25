@@ -1,0 +1,19 @@
+{
+  "name": "whois.pk",
+  "version": "1.0.0",
+  "description": "A WHOIS client for PKNIC (.pk) domains",
+  "main": "index.js",
+  "bin": {
+    "whois.pk": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abbas Siddiqi",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "cheerio": "^1.0.0-rc.2",
+    "commander": "^2.11.0"
+  }
+}
