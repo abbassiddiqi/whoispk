@@ -1,9 +1,6 @@
 # whoispk
 
-[![NPM version][npm-image]][npm-url]
-[![NPM downloads][downloads-image]][downloads-url]
-
-Issue WHOIS lookup for PKNIC (.pk) domain names from the command line
+Issue WHOIS lookup for PKNIC (.pk) domain names from the command line.
 
 ## Installation
 
@@ -28,8 +25,6 @@ yarn global add whoispk
     Options:
       -V, --version  output the version number
       -h, --help     output usage information
-
-Source of information: http://pknic.net.pk
 
 ### Local
 
@@ -64,6 +59,8 @@ whoispk.lookup('daraz.pk', function(err, domainInfo) {
 
 });
 ```
+
+Source of information: http://pknic.net.pk
 
 ## Contributing
 
