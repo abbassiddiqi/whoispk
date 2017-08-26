@@ -1,6 +1,6 @@
 {
   "name": "whoispk",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A WHOIS client for PKNIC (.pk) domains",
   "main": "index.js",
   "preferGlobal": true,
