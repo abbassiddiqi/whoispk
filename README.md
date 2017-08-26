@@ -1,4 +1,4 @@
-whois.pk
+whoispk
 ========
 
 Issue WHOIS lookup for PKNIC (.pk) domain names from the command line
@@ -7,11 +7,11 @@ Issue WHOIS lookup for PKNIC (.pk) domain names from the command line
 
 ### Global
 
-    $ npm install -g whois.pk
+    $ npm install -g whoispk
 
 ### Usage
 
-    whois.pk [options] address
+    whoispk [options] address
 
     Options:
       -h, --help      display this help message
@@ -31,4 +31,4 @@ Contributors are welcome
 
 ## License
 
-whois.pk is available under [the MIT license](https://github.com/jgthms/bulma/blob/master/LICENSE).
+whoispk is available under [the MIT license](https://github.com/abbassiddiqi/whoispk/blob/master/LICENSE).
