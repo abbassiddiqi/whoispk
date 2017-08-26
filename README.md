@@ -45,13 +45,13 @@ yarn add whoispk
 ```js
 const whoispk = require('whoispk');
 
-whoispk.lookup('daraz.pk', function(err, domainInfo) {
+whoispk.lookup('daraz.pk', function (err, domainInfo) {
 
-  if ( err ) {
+  if (err) {
     throw err;
   }
 
-  if ( domainInfo.isFound ) {
+  if (domainInfo.isFound) {
     console.log(domainInfo.data);
   } else {
     console.log('Domain not Found');
@@ -64,7 +64,7 @@ Source of information: http://pknic.net.pk
 
 ## Contributing
 
-Contributors are welcome
+Contributions are welcome.
 
 ## License
 
