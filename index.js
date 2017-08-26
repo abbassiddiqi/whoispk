@@ -18,11 +18,10 @@ exports.lookup = function(addr, options, done) {
 program
   .version(pkg.version)
   .description(pkg.description)
-  .usage('[options] address')
-  .option('-h, --help','display this help message')
-  .option('-V, --version', 'output the version number')
-  .option('-v, --verbose', 'show verbose results')
-  .parse(process.argv);
+  .arguments('<addr>')
+  .usage('[options] address');
+
+program.parse(process.argv);
 
 const pknicUrl = "https://pk6.pknic.net.pk/pk5/lookup.PK";
 
@@ -111,7 +110,9 @@ function printMessage(domainInfo) {
 }
 
 
-// Run
+// Run the program
+
+if (!program.args.length) program.help();
 
 const address = process.argv.slice(2);
 fetchWhois(address);
