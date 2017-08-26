@@ -3,6 +3,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const program = require('commander');
+const changeCase = require('change-case');
 const querystring = require('querystring');
 
 const pkg = require('./package.json');
@@ -12,7 +13,13 @@ exports.lookup = function(addr, options, done) {
     done = options;
     options = {};
   }
-  fetchWhois(addr, done)
+  fetchWhois(addr, function(err, domainInfo){
+    if(err) {
+      done(err);
+    } else {
+      done(null, domainInfo);
+    }
+  });
 }
 
 program
@@ -32,7 +39,8 @@ function fetchWhois(addr, done) {
     .then(function(response) {
 
       let domainInfo = {
-        isFound: false
+        isFound: false,
+        address: addr
       };
 
       const $ = cheerio.load(response.data);
@@ -41,14 +49,15 @@ function fetchWhois(addr, done) {
 
       // Domain Not Found
       if( $formBox.length ) {
-        domainInfo = {
-          isFound: false,
-          address: addr
-        }
+        //
       }
       // Domain Found
-      else if( $whiteBox.length ) {
+      if( $whiteBox.length ) {
         domainInfo = parseResult($whiteBox);
+      }
+
+      if( typeof done == "function" ) {
+        done(null, domainInfo);
       }
 
       printMessage(domainInfo);
@@ -57,6 +66,9 @@ function fetchWhois(addr, done) {
       console.log("Server connection Error!");
       console.log("Please try again.");
       console.log(error);
+      if( typeof done == "function" ) {
+        done(error);
+      }
     });
 }
 
@@ -65,7 +77,7 @@ function parseResult($data) {
   $rows = $data.find("tr");
 
   let lastHeading = "";
-  const domainInfo = { isFound: true };
+  const domainInfo = { isFound: true, data: {} };
   $rows.each(function(i, row) {
     $row = cheerio(row);
     if($row.children().length == 4) {
@@ -73,16 +85,19 @@ function parseResult($data) {
       const value = $row.children().eq(3).text().replace(/\s+/g,' ').trim();
 
       if( key && value ) {
-        if(key == "Registrant Name:") { key = "Registrant:"};
-        if(key == "Agent Organization:") {key = "Agent Org:"};
-        domainInfo[key] = value;
+        key = key.replace(/\:$/,'');
+        if(key == "Registrant Name") { key = "Registrant"};
+        if(key == "Agent Organization") {key = "Agent Org"};
+        key = changeCase.snakeCase(key);
+        domainInfo.data[key] = value;
       }
       if( key && !value ) {
+        key = changeCase.snakeCase(key);
         lastHeading = key;
-        domainInfo[lastHeading] = [];
+        domainInfo.data[lastHeading] = [];
       }
       if( !key && value ) {
-        domainInfo[lastHeading].push(value);
+        domainInfo.data[lastHeading].push(value);
       }
     }
   });
@@ -92,23 +107,23 @@ function parseResult($data) {
 
 function printMessage(domainInfo) {
   if( !domainInfo.isFound ) {
-    console.log("Domain not found: " + domainInfo.address);
-    console.log("This domain is not registered and may be available for registration to you.");
+    console.log("");
+    console.log("   Domain not found: " + domainInfo.address);
+    console.log("   This domain is not registered and may be available for registration to you.");
     console.log("");
   }
 
   if( domainInfo.isFound ) {
       console.log("");
-      for(const prop in domainInfo) {
-        if(prop == "isFound") continue;
-        if( typeof domainInfo[prop] == "object" ) {
+      for(const prop in domainInfo.data) {
+        if( typeof domainInfo.data[prop] == "object" ) {
           console.log("");
-          console.log("  " + prop + ": ");
-          domainInfo[prop].forEach(function(item){
+          console.log("   " + changeCase.titleCase(prop) + ":");
+          domainInfo.data[prop].forEach(function(item){
             console.log("\t\t" + item);
           });
         } else {
-          console.log("  " + prop + "\t" + domainInfo[prop]);
+          console.log("   " + changeCase.titleCase(prop) + ":\t" + domainInfo.data[prop]);
         }
       }
       console.log("");
@@ -116,9 +131,10 @@ function printMessage(domainInfo) {
 }
 
 
-// Run the program
-
-if (!program.args.length) program.help();
-
-const address = process.argv.slice(2);
-fetchWhois(address);
+// To run the program from command-line
+if (!program.args.length) {
+  program.help();
+} else {
+  const address = process.argv.slice(2);
+  fetchWhois(address);
+}

@@ -1,5 +1,7 @@
-whoispk
-========
+# whoispk
+
+[![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][downloads-url]
 
 Issue WHOIS lookup for PKNIC (.pk) domain names from the command line
 
@@ -7,23 +9,61 @@ Issue WHOIS lookup for PKNIC (.pk) domain names from the command line
 
 ### Global
 
-    $ npm install -g whoispk
+Using NPM
 
-### Usage
+```sh
+npm install -g whoispk
+```
+
+Using YARN
+
+```sh
+yarn global add whoispk
+```
+
+#### Usage
 
     whoispk [options] address
 
     Options:
-      -h, --help      display this help message
-      -V, --version   output the version number
-      -v, --verbose   show verbose results  
+      -V, --version  output the version number
+      -h, --help     output usage information
 
 Source of information: http://pknic.net.pk
 
-## Todo
+### Local
 
-* Add further features
-* Update license info
+Using NPM
+
+```sh
+npm install whoispk
+```
+
+Using YARN
+
+```sh
+yarn add whoispk
+```
+
+#### Usage
+
+```js
+const whoispk = require('whoispk');
+
+whoispk.lookup('daraz.pk', function(err, domainInfo) {
+
+  if ( err ) {
+    throw err;
+  }
+
+  if ( domainInfo.isFound ) {
+    console.log(domainInfo.data);
+  } else {
+    console.log('Domain not Found');
+  }
+
+});
+```
 
 ## Contributing
 
