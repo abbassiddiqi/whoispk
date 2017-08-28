@@ -1,11 +1,11 @@
 {
   "name": "whoispk",
   "version": "1.0.5",
-  "description": "A WHOIS client for PKNIC (.pk) domains",
-  "main": "index.js",
+  "description": "A robust WHOIS client for PKNIC (.pk) domains",
+  "main": "./lib/whoispk.js",
   "preferGlobal": true,
   "bin": {
-    "whoispk": "index.js"
+    "whoispk": "./bin/whoispk.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
