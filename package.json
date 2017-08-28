@@ -1,6 +1,6 @@
 {
   "name": "whoispk",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A robust WHOIS client for PKNIC (.pk) domains",
   "keywords": [
     "whois",
