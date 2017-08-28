@@ -1,5 +1,10 @@
 # whoispk
 
+[![npm version](http://img.shields.io/npm/v/whoispk.svg?style=flat)](https://npmjs.org/package/whoispk "View this project on npm")
+[![npm](https://img.shields.io/npm/dt/whoispk.svg)]()
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?colorB=9b59b6)](http://opensource.org/licenses/MIT)
+
+
 Issue WHOIS lookup for PKNIC (.pk) domain names from the command line.
 
 ## Installation

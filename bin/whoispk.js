@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const program = require('commander');
 const changeCase = require('change-case');
 const whoispk = require('../lib/whoispk.js');
