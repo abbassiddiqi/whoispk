@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const program = require('commander');
 const changeCase = require('change-case');
+const chalk = require('chalk');
 const whoispk = require('../lib/whoispk.js');
 const pkg = require('../package.json');
 
@@ -34,8 +37,8 @@ if (!program.args.length) {
 function printMessage(domainInfo) {
   if (!domainInfo.isFound) {
     console.log("");
-    console.log("   Domain not found: " + domainInfo.address);
-    console.log("   This domain is not registered and may be available for registration to you.");
+    console.log("   Domain not found: " + chalk.inverse(domainInfo.address));
+    console.log(chalk.italic.dim("   This domain is not registered and may be available for registration to you."));
     console.log("");
   }
 
@@ -44,12 +47,12 @@ function printMessage(domainInfo) {
       for (const prop in domainInfo.data) {
         if (typeof domainInfo.data[prop] == "object") {
           console.log("");
-          console.log("   " + changeCase.titleCase(prop) + ":");
+          console.log("   " + chalk.italic(changeCase.titleCase(prop) + ":"));
           domainInfo.data[prop].forEach(function (item) {
-            console.log("\t\t" + item);
+            console.log("\t\t" + chalk(item));
           });
         } else {
-          console.log("   " + changeCase.titleCase(prop) + ":\t" + domainInfo.data[prop]);
+          console.log("   " + chalk.italic(changeCase.titleCase(prop) + ":\t") + chalk(domainInfo.data[prop]) );
         }
       }
       console.log("");

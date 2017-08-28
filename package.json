@@ -17,7 +17,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Abbas Siddiqi",
+  "author": {
+    "name": "Abbas Siddiqi",
+    "email": "abbas.siddiqi1@gmail.com",
+    "url": "abbassiddiqi.com"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/abbassiddiqi/whoispk.git"
@@ -31,6 +35,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "chalk": "^2.1.0",
     "change-case": "^3.0.1",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.11.0",
