@@ -2,6 +2,13 @@
   "name": "whoispk",
   "version": "1.0.6",
   "description": "A robust WHOIS client for PKNIC (.pk) domains",
+  "keywords": [
+    "whoispk",
+    "pakistan",
+    "whois",
+    "pknic",
+    "pk"
+  ],
   "main": "./lib/whoispk.js",
   "preferGlobal": true,
   "bin": {
