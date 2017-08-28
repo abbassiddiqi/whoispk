@@ -20,7 +20,7 @@ if (!program.args.length) {
   const address = process.argv.slice(2);
 
   whoispk.lookup(address, function (err, domainInfo) {
-    if(err) {
+    if (err) {
       console.log("Server connection Error!");
       console.log("Please try again.");
       throw err;
@@ -31,20 +31,20 @@ if (!program.args.length) {
 
 
 function printMessage(domainInfo) {
-  if( !domainInfo.isFound ) {
+  if (!domainInfo.isFound) {
     console.log("");
     console.log("   Domain not found: " + domainInfo.address);
     console.log("   This domain is not registered and may be available for registration to you.");
     console.log("");
   }
 
-  if( domainInfo.isFound ) {
+  if (domainInfo.isFound) {
       console.log("");
-      for(const prop in domainInfo.data) {
-        if( typeof domainInfo.data[prop] == "object" ) {
+      for (const prop in domainInfo.data) {
+        if (typeof domainInfo.data[prop] == "object") {
           console.log("");
           console.log("   " + changeCase.titleCase(prop) + ":");
-          domainInfo.data[prop].forEach(function(item){
+          domainInfo.data[prop].forEach(function (item) {
             console.log("\t\t" + item);
           });
         } else {
