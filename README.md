@@ -1,9 +1,9 @@
-# whoispk
+whoispk
+=======
 
 [![npm version](http://img.shields.io/npm/v/whoispk.svg?style=flat)](https://npmjs.org/package/whoispk "View this project on npm")
 [![npm](https://img.shields.io/npm/dt/whoispk.svg)]()
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?colorB=9b59b6)](http://opensource.org/licenses/MIT)
-
 
 Issue WHOIS lookup for PKNIC (.pk) domain names from the command line.
 
@@ -11,16 +11,8 @@ Issue WHOIS lookup for PKNIC (.pk) domain names from the command line.
 
 ### Global
 
-Using NPM
-
 ```sh
 npm install -g whoispk
-```
-
-Using YARN
-
-```sh
-yarn global add whoispk
 ```
 
 #### Usage
@@ -33,19 +25,13 @@ yarn global add whoispk
 
 ### Local
 
-Using NPM
-
 ```sh
 npm install whoispk
 ```
 
-Using YARN
-
-```sh
-yarn add whoispk
-```
-
 #### Usage
+
+Using callback function
 
 ```js
 const whoispk = require('whoispk');
@@ -63,6 +49,26 @@ whoispk.lookup('daraz.pk', function (err, domainInfo) {
   }
 
 });
+```
+
+or Using ES6 Promise
+
+```js
+const whoispk = require('whoispk');
+
+whoispk
+  .lookup('daraz.pk')
+  .then(function (domainInfo) {
+
+    if (domainInfo.isFound) {
+      console.log(domainInfo.data);
+    } else {
+      console.log('Domain not Found');
+    }
+  })
+  .catch(function (err) {
+    throw err;
+  });
 ```
 
 The console will show following information if domainInfo.isFound is true

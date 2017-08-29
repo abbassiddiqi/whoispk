@@ -21,20 +21,21 @@ if (!program.args.length) {
 }
 
 function getDomainInfo (address) {
-  whoispk.lookup(address, function (err, domainInfo) {
-    if (err) {
-      console.log("");
-      console.log(chalk.red("   Error!") + " Server connection Error.");
-      console.log("         " + " Please try again.");
-      console.log("");
+
+  whoispk
+    .lookup(address)
+    .then(function (domainInfo) {
+      printDomainInfo(domainInfo);
+      process.exit(0);
+    })
+    .catch(function (err) {
+      printErrorMessage();
       process.exit(1);
-    }
-    printMessage(domainInfo);
-    process.exit(0);
-  });
+    });
 }
 
-function printMessage (domainInfo) {
+function printDomainInfo (domainInfo) {
+
   if (!domainInfo.isFound) {
     console.log("");
     console.log("   Domain not found: " + chalk.inverse(domainInfo.address));
@@ -57,4 +58,11 @@ function printMessage (domainInfo) {
       }
       console.log("");
   }
+}
+
+function printErrorMessage() {
+  console.log("");
+  console.log(chalk.red("   Error!") + " Server connection Error.");
+  console.log("         " + " Please try again.");
+  console.log("");
 }
