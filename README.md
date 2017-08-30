@@ -3,6 +3,7 @@ whoispk
 
 [![npm version](http://img.shields.io/npm/v/whoispk.svg?style=flat)](https://npmjs.org/package/whoispk "View this project on npm")
 [![npm](https://img.shields.io/npm/dt/whoispk.svg)]()
+[![Build Status](https://travis-ci.org/abbassiddiqi/whoispk.svg?branch=master)](https://travis-ci.org/abbassiddiqi/whoispk)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?colorB=9b59b6)](http://opensource.org/licenses/MIT)
 
 Issue WHOIS lookup for PKNIC (.pk) domain names from the command line.
@@ -31,8 +32,6 @@ npm install whoispk
 
 #### Usage
 
-Using callback function
-
 ```js
 const whoispk = require('whoispk');
 
@@ -51,7 +50,7 @@ whoispk.lookup('daraz.pk', function (err, domainInfo) {
 });
 ```
 
-or Using ES6 Promise
+or using ES6 Promises:
 
 ```js
 const whoispk = require('whoispk');
@@ -71,7 +70,7 @@ whoispk
   });
 ```
 
-The console will show following information if domainInfo.isFound is true
+The console will show following information if domainInfo.isFound is true:
 ```js
 {
   domain_name: 'daraz.pk',
@@ -101,7 +100,8 @@ Source of information: http://pknic.net.pk
 
 ## Contributing
 
-Contributions are welcome.
+- Discuss ideas in issues section
+- Spread the word
 
 ## License
 
