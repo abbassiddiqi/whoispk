@@ -4,6 +4,7 @@
 const chalk = require('chalk');
 const program = require('commander');
 const changeCase = require('change-case');
+const Spinner = require('cli-spinner').Spinner;
 
 const pkg = require('../package.json');
 const whoispk = require('../lib/whoispk.js');
@@ -22,9 +23,16 @@ if (!program.args.length) {
 
 function getDomainInfo (address) {
 
+  console.log("");
+
+  const spinner = new Spinner('   Fetching domain info %s ');
+  spinner.setSpinnerString('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏');
+  spinner.start();
+
   whoispk
     .lookup(address)
     .then(function (domainInfo) {
+      spinner.stop(true);
       printDomainInfo(domainInfo);
       process.exit(0);
     })
@@ -37,14 +45,12 @@ function getDomainInfo (address) {
 function printDomainInfo (domainInfo) {
 
   if (!domainInfo.isFound) {
-    console.log("");
     console.log("   Domain not found: " + chalk.inverse(domainInfo.address));
     console.log(chalk.italic.dim("   This domain is not registered and may be available for registration to you."));
     console.log("");
   }
 
   if (domainInfo.isFound) {
-      console.log("");
       for (const prop in domainInfo.data) {
         if (typeof domainInfo.data[prop] == "object") {
           console.log("");
@@ -61,7 +67,6 @@ function printDomainInfo (domainInfo) {
 }
 
 function printErrorMessage() {
-  console.log("");
   console.log(chalk.red("   Error!") + " Server connection Error.");
   console.log("         " + " Please try again.");
   console.log("");
