@@ -1,49 +1,53 @@
 {
   "name": "whoispk",
-  "version": "1.1.1",
-  "description": "A robust WHOIS client for PKNIC (.pk) domains",
+  "version": "2.0.0",
+  "description": "Check .pk domain availability and registration details from PKNIC, from the command line or Node.js",
   "keywords": [
     "whois",
     "pk",
     "pknic",
     "whoispk",
-    "pakistan"
+    "pakistan",
+    "domain",
+    "availability",
+    "cli"
   ],
-  "main": "index.js",
-  "preferGlobal": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
-    "whoispk": "./bin/whoispk.js"
+    "whoispk": "bin/whoispk.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.19"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "node --test",
+    "test:live": "WHOISPK_LIVE=1 node --test"
   },
   "author": {
     "name": "Abbas Siddiqi",
     "email": "abbas.siddiqi1@gmail.com",
-    "url": "abbassiddiqi.com"
+    "url": "https://abbassiddiqi.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/abbassiddiqi/whoispk.git"
+    "url": "git+https://github.com/abbassiddiqi/whoispk.git"
   },
   "bugs": {
     "url": "https://github.com/abbassiddiqi/whoispk/issues"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/abbassiddiqi/whoispk/blob/master/LICENSE"
-  },
-  "dependencies": {
-    "axios": "^0.16.2",
-    "chalk": "^2.1.0",
-    "change-case": "^3.0.1",
-    "cheerio": "^1.0.0-rc.2",
-    "cli-spinner": "^0.2.6",
-    "commander": "^2.11.0",
-    "querystring": "^0.2.0"
-  },
-  "devDependencies": {
-    "chai": "^4.1.1",
-    "mocha": "^3.5.0"
-  }
+  "homepage": "https://github.com/abbassiddiqi/whoispk#readme",
+  "license": "MIT"
 }
