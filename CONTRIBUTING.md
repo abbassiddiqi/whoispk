@@ -77,4 +77,6 @@ Please be gentle with PKNIC's servers. Use fixtures in tests, and don't add loop
 
 ## Releasing (maintainers)
 
-See [docs/releasing.md](docs/releasing.md). In short: update `CHANGELOG.md`, run `npm version <patch|minor|major>`, `npm publish`, then `git push --follow-tags`.
+See [docs/releasing.md](docs/releasing.md). In short: rename `## Unreleased` in `CHANGELOG.md` to the new version, run `npm version <patch|minor|major>`, then `git push --follow-tags`. GitHub Actions publishes to npm and creates the GitHub Release.
+
+Pull requests that change behaviour should add a line under `## Unreleased` in `CHANGELOG.md`.

@@ -52,10 +52,17 @@ export function lookup(domain: string, options?: LookupOptions): Promise<LookupR
 export function parse(html: string): Omit<LookupResult, 'domain'> & { domain: string | null };
 export function normalizeDomain(input: string): string;
 
+/** The .pk extensions anyone can register: pk, com.pk, net.pk, org.pk, biz.pk, web.pk, fam.pk. */
+export const EXTENSIONS: readonly string[];
+/** "magic" or "magic.com.pk" -> one domain per entry in EXTENSIONS. */
+export function expandExtensions(input: string): string[];
+
 declare const whoispk: {
   lookup: typeof lookup;
   parse: typeof parse;
   normalizeDomain: typeof normalizeDomain;
+  expandExtensions: typeof expandExtensions;
+  EXTENSIONS: readonly string[];
   WhoisPkError: typeof WhoisPkError;
   ENDPOINT: string;
 };

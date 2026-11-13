@@ -8,6 +8,8 @@ whoispk [options] <domain...>
 
 | Option                  | Default | Description                                               |
 | ----------------------- | ------- | --------------------------------------------------------- |
+| `-a`, `--all`           | off     | Check the name under every public extension (see [below](#checking-every-extension)) |
+| `-s`, `--short`         | off, on with `--all` | One line per domain. `--no-short` turns it off. |
 | `-j`, `--json`          | off     | Print results as JSON instead of text                     |
 | `-t`, `--timeout <ms>`  | `15000` | Timeout for each request to PKNIC                         |
 | `-c`, `--concurrency <n>` | `3`   | How many lookups run at once when you pass several domains |
@@ -44,7 +46,41 @@ EOF
 whoispk < ideas.txt
 ```
 
-Results are printed in the order you gave the domains, even though lookups run in parallel.
+Results are printed in the order you gave the domains, even though lookups run in parallel. Each domain is checked only once, so `whoispk magic magic.pk` makes a single lookup.
+
+## Checking every extension
+
+`--all` checks a name under every extension anyone can register:
+
+```console
+$ whoispk --all chaiwala
+chaiwala.pk      ● Registered       expires Mar 20, 2027
+chaiwala.com.pk  ● Registered       expires Oct 10, 2030
+chaiwala.net.pk  ● Available
+chaiwala.org.pk  ● Available
+chaiwala.biz.pk  ● Available
+chaiwala.web.pk  ● Available
+chaiwala.fam.pk  ● Available
+```
+
+The extensions are `.pk`, `.com.pk`, `.net.pk`, `.org.pk`, `.biz.pk`, `.web.pk` and `.fam.pk`. Any extension you type is replaced, so `chaiwala`, `chaiwala.pk` and `chaiwala.com.pk` all check the same seven domains.
+
+PKNIC's restricted extensions are left out: `.edu.pk`, `.gov.pk`, and the provincial government ones (`.gok.pk`, `.gob.pk`, `.gop.pk`, `.gos.pk`). Only institutions can register those. To check one anyway, name it directly: `whoispk uni.edu.pk`.
+
+`--all` works with several names, from arguments or stdin. Each name's group is separated by a blank line. It also works with `--json`, which gives an array with one entry per domain.
+
+## Short output
+
+`-s` (`--short`) prints one line per domain, which is easier to scan when checking many:
+
+```console
+$ whoispk -s daraz magicnotatall x.pk
+daraz.pk          ● Registered       expires May 14, 2028
+magicnotatall.pk  ● Available
+x.pk              ● Not registrable  Invalid Domain name [Three or less characters without suffix e.g. COM.PK]
+```
+
+Short output is on by default with `--all`. Add `--no-short` to see full details, including nameservers.
 
 ## Text output
 

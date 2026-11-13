@@ -40,6 +40,30 @@ export function normalizeDomain(input) {
   return domain;
 }
 
+/**
+ * The .pk extensions anyone can register. PKNIC also has restricted ones
+ * (edu.pk, gov.pk, gok.pk, gob.pk, gop.pk, gos.pk) for institutions only.
+ */
+export const EXTENSIONS = Object.freeze(['pk', 'com.pk', 'net.pk', 'org.pk', 'biz.pk', 'web.pk', 'fam.pk']);
+
+const SECOND_LEVEL = /\.(?:com|net|org|biz|web|fam|edu|gov|gok|gob|gop|gos)$/;
+
+/**
+ * Expand a name into one domain per public .pk extension.
+ *
+ *   "magic" or "magic.com.pk" -> ["magic.pk", "magic.com.pk", "magic.net.pk", …]
+ *
+ * @param {string} input
+ * @returns {string[]}
+ */
+export function expandExtensions(input) {
+  const base = normalizeDomain(input).replace(/\.pk$/, '').replace(SECOND_LEVEL, '');
+  if (!base) {
+    throw new WhoisPkError(`"${input}" has no name to check`, { code: 'INVALID_INPUT' });
+  }
+  return EXTENSIONS.map((ext) => `${base}.${ext}`);
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function request(domain, { endpoint, timeout, signal, fetch: fetchImpl }) {
@@ -127,4 +151,4 @@ export async function lookup(input, options = {}) {
   }
 }
 
-export default { lookup, parse, normalizeDomain, WhoisPkError, ENDPOINT };
+export default { lookup, parse, normalizeDomain, expandExtensions, EXTENSIONS, WhoisPkError, ENDPOINT };

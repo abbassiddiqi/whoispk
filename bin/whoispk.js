@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
-import { lookup, ENDPOINT } from '../src/index.js';
+import { lookup, normalizeDomain, expandExtensions, EXTENSIONS, ENDPOINT } from '../src/index.js';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -14,12 +14,19 @@ Check whether .pk domains are registered, using PKNIC's public lookup.
 Domains can also be piped in, one per line: cat domains.txt | whoispk
 
 Options:
-  -j, --json           Print results as JSON
-  -t, --timeout <ms>   Per-request timeout in milliseconds (default: 15000)
+  -a, --all              Check every public extension: ${EXTENSIONS.map((e) => '.' + e).join(' ')}
+  -s, --short            One line per domain (the default with --all; --no-short for details)
+  -j, --json             Print results as JSON
+  -t, --timeout <ms>     Per-request timeout in milliseconds (default: 15000)
   -c, --concurrency <n>  Parallel lookups when checking several domains (default: 3)
-      --no-color       Disable colours (also respects NO_COLOR)
-  -v, --version        Print the version
-  -h, --help           Show this help
+      --no-color         Disable colours (also respects NO_COLOR)
+  -v, --version          Print the version
+  -h, --help             Show this help
+
+Examples:
+  whoispk daraz.pk
+  whoispk --all chaiwala
+  whoispk --json daraz google.com.pk
 
 Exit codes:
   0  all lookups completed
@@ -36,6 +43,9 @@ try {
   args = parseArgs({
     allowPositionals: true,
     options: {
+      all: { type: 'boolean', short: 'a' },
+      short: { type: 'boolean', short: 's' },
+      'no-short': { type: 'boolean' },
       json: { type: 'boolean', short: 'j' },
       timeout: { type: 'string', short: 't' },
       concurrency: { type: 'string', short: 'c' },
@@ -62,17 +72,29 @@ if (opts.version) {
 const timeout = parsePositiveInt(opts.timeout, 15_000, '--timeout');
 const concurrency = parsePositiveInt(opts.concurrency, 3, '--concurrency');
 
-let domains = positionals;
-if (!domains.length && !process.stdin.isTTY) {
-  domains = (await readStdin())
+let inputs = positionals;
+if (!inputs.length && !process.stdin.isTTY) {
+  inputs = (await readStdin())
     .split(/\r?\n/)
     .flatMap((line) => line.replace(/#.*/, '').split(/[\s,]+/))
     .filter(Boolean);
 }
-if (!domains.length) {
+if (!inputs.length) {
   process.stdout.write(HELP.trimStart());
   process.exit(2);
 }
+
+// Expand --all, normalise, and drop duplicates. Inputs that can't be normalised are kept
+// as typed, so their lookup reports the problem in place.
+const domains = [
+  ...new Set(
+    inputs
+      .flatMap((input) => (opts.all ? attempt(() => expandExtensions(input), [input]) : [input]))
+      .map((input) => attempt(() => normalizeDomain(input), input)),
+  ),
+];
+const short = opts['no-short'] ? false : Boolean(opts.short || opts.all);
+const nameWidth = Math.max(...domains.map((d) => d.length));
 
 // ---------------------------------------------------------------------------
 // Styling
@@ -130,8 +152,14 @@ for (const [i, promise] of pending.entries()) {
   }
 
   spinner.clear();
-  if (i > 0) console.log('');
-  console.log(outcome.ok ? formatResult(outcome.result) : formatError(outcome.input, outcome.error));
+  if (short) {
+    // Blank line between groups of names, e.g. between "magic.*" and "chaiwala.*" with --all.
+    if (i > 0 && opts.all && baseName(domains[i]) !== baseName(domains[i - 1])) console.log('');
+    console.log(formatShort(outcome));
+  } else {
+    if (i > 0) console.log('');
+    console.log(outcome.ok ? formatResult(outcome.result) : formatError(outcome.input, outcome.error));
+  }
 }
 
 spinner.stop();
@@ -164,6 +192,22 @@ function formatResult(r) {
   }
 
   return lines.join('\n');
+}
+
+function formatShort({ ok, input, result: r, error }) {
+  const name = c.bold((ok ? r.domain : input).padEnd(nameWidth));
+  const status = (text, colour) => colour(text.padEnd(18));
+  if (!ok) return `${name}  ${status('✖ Lookup failed', c.red)} ${c.dim(error.message)}`;
+  if (r.status === 'registered') {
+    const expiry = r.expireDate ? c.dim(`expires ${formatDate(r.expireDate)}`) : '';
+    return `${name}  ${status('● Registered', c.red)} ${expiry}`.trimEnd();
+  }
+  if (r.status === 'available') return `${name}  ${c.green('● Available')}`;
+  return `${name}  ${status('● Not registrable', c.yellow)} ${c.dim(r.reasons.join('; '))}`.trimEnd();
+}
+
+function baseName(domain) {
+  return domain.split('.')[0];
 }
 
 function formatError(domain, err) {
@@ -238,6 +282,14 @@ function createLimiter(max) {
       queue.push({ fn, resolve, reject });
       next();
     });
+}
+
+function attempt(fn, fallback) {
+  try {
+    return fn();
+  } catch {
+    return fallback;
+  }
 }
 
 function parsePositiveInt(raw, fallback, name) {

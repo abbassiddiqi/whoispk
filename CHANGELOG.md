@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- New: `--all` checks a name under every extension anyone can register: `.pk`, `.com.pk`, `.net.pk`, `.org.pk`, `.biz.pk`, `.web.pk` and `.fam.pk`. `whoispk --all chaiwala` and `whoispk --all chaiwala.com.pk` check the same seven domains.
+- New: `-s, --short` prints one line per domain. It's the default with `--all`; `--no-short` brings back the detailed view.
+- New: `expandExtensions()` and `EXTENSIONS` in the library.
+- Changed: the CLI skips duplicates, so `whoispk magic magic.pk` checks once.
+- Releases are now published by GitHub Actions with npm trusted publishing, so every version has a provenance badge on npm.
+
 ## 2.0.1 (2026-11-14)
 
 - Fixed: the `timeout` option now keeps Node running until it fires. Before, a stalled request could let the process exit early with no error. The timeout also covers reading the response body now.

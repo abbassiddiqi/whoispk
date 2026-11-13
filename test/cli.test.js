@@ -25,7 +25,8 @@ before(async () => {
     req.on('data', (chunk) => (body += chunk));
     req.on('end', () => {
       const name = new URLSearchParams(body).get('name');
-      const [status, html] = (responses[name] ?? responses['magicnotatall.pk'])();
+      // Unknown names get the "not found" page, rewritten to name the domain asked for, as PKNIC does.
+      const [status, html] = responses[name]?.() ?? [200, fixture('available.html').replaceAll('magicnotatall.pk', name)];
       res.writeHead(status, { 'content-type': 'text/html' }).end(html);
     });
   });
@@ -83,6 +84,39 @@ test('exits 1 when a lookup fails, still printing the others', async () => {
   assert.equal(failed.status, 'error');
   assert.equal(failed.error.code, 'HTTP_ERROR');
   assert.equal(ok.status, 'registered');
+});
+
+test('--all checks every public extension, one line each', async () => {
+  const { code, stdout } = await run(['--all', 'magic']);
+  assert.equal(code, 0);
+  const lines = stdout.trimEnd().split('\n');
+  assert.deepEqual(
+    lines.map((l) => l.split(/\s+/)[0]),
+    ['magic.pk', 'magic.com.pk', 'magic.net.pk', 'magic.org.pk', 'magic.biz.pk', 'magic.web.pk', 'magic.fam.pk'],
+  );
+  assert.match(lines[0], /^magic\.pk +● Registered +expires Nov 7, 2027$/);
+  assert.match(lines[1], /^magic\.com\.pk +● Available$/);
+});
+
+test('--all separates groups, and --json returns every result', async () => {
+  const { stdout } = await run(['--all', 'magic', 'chaiwala']);
+  assert.match(stdout, /magic\.fam\.pk +● Available\n\nchaiwala\.pk /);
+
+  const json = JSON.parse((await run(['--all', '--json', 'magic'])).stdout);
+  assert.equal(json.length, 7);
+  assert.equal(json[0].status, 'registered');
+});
+
+test('--short prints one line per domain and skips duplicates', async () => {
+  const { stdout } = await run(['-s', 'magic', 'x.pk', 'MAGIC.pk']);
+  const lines = stdout.trimEnd().split('\n');
+  assert.equal(lines.length, 2);
+  assert.match(lines[1], /^x\.pk +● Not registrable +Invalid Domain name/);
+});
+
+test('--no-short shows full details with --all', async () => {
+  const { stdout } = await run(['--all', '--no-short', 'magic']);
+  assert.match(stdout, /Nameservers +23\.227\.38\.65/);
 });
 
 test('exits 2 on bad usage', async () => {

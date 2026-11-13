@@ -1,0 +1,57 @@
+name: Release
+
+# Runs when a version tag is pushed, e.g. by `npm version patch && git push --follow-tags`.
+# Publishes to npm with trusted publishing (no npm token needed; adds provenance),
+# then creates the GitHub Release from CHANGELOG.md.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the GitHub Release
+  id-token: write # npm trusted publishing
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check the tag matches package.json
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match package.json version $version"
+            exit 1
+          fi
+
+      - name: Check CHANGELOG.md has notes for this version
+        run: node scripts/release-notes.js "$GITHUB_REF_NAME" > release-notes.md
+
+      - run: npm test
+
+      - name: Update npm (trusted publishing needs npm 11.5.1 or later)
+        run: npm install -g npm@latest
+
+      - name: Publish to npm
+        run: |
+          # Pre-releases like 2.1.0-beta.0 go to the "next" tag, so `latest` stays stable.
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            npm publish --tag next
+          else
+            npm publish
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          [[ "$GITHUB_REF_NAME" == *-* ]] && flags+=(--prerelease)
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.md "${flags[@]}"

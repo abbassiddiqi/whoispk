@@ -1,7 +1,7 @@
 # API reference
 
 ```js
-import { lookup, parse, normalizeDomain, WhoisPkError, ENDPOINT, USER_AGENT } from 'whoispk';
+import { lookup, parse, normalizeDomain, expandExtensions, EXTENSIONS, WhoisPkError, ENDPOINT, USER_AGENT } from 'whoispk';
 ```
 
 The package is ESM. On Node.js 20.19 or later you can also load it with `require('whoispk')`. Type definitions are included.
@@ -106,6 +106,27 @@ In order, it:
 
 It throws `WhoisPkError` with code `INVALID_INPUT` when nothing is left. It doesn't check whether the name is allowed. PKNIC does that, and reports it as `status: 'invalid'`.
 
+## `expandExtensions(input)`
+
+Turns a name into one domain for each public `.pk` extension. This is what the CLI's `--all` uses.
+
+```js
+expandExtensions('chaiwala');
+// ['chaiwala.pk', 'chaiwala.com.pk', 'chaiwala.net.pk', 'chaiwala.org.pk',
+//  'chaiwala.biz.pk', 'chaiwala.web.pk', 'chaiwala.fam.pk']
+```
+
+The input is cleaned up with `normalizeDomain` first, and any `.pk` extension is replaced, so `'chaiwala.com.pk'` gives the same list. It throws `WhoisPkError` with code `INVALID_INPUT` when there's no name left, e.g. for `'.pk'`.
+
+To check them all:
+
+```js
+for (const domain of expandExtensions('chaiwala')) {
+  const r = await lookup(domain);
+  console.log(domain, r.status);
+}
+```
+
 ## `WhoisPkError`
 
 Every failure from `lookup()` rejects with a `WhoisPkError`, a subclass of `Error`.
@@ -141,8 +162,9 @@ try {
 ## Constants
 
 - `ENDPOINT`: the PKNIC lookup URL, `https://pk6.pknic.net.pk/pk5/lookup.PK`
+- `EXTENSIONS`: the extensions anyone can register: `['pk', 'com.pk', 'net.pk', 'org.pk', 'biz.pk', 'web.pk', 'fam.pk']`. PKNIC's restricted extensions (`edu.pk`, `gov.pk`, `gok.pk`, `gob.pk`, `gop.pk`, `gos.pk`) aren't included.
 - `USER_AGENT`: the `User-Agent` sent with each request, e.g. `whoispk/2.0.0 (+https://github.com/abbassiddiqi/whoispk)`
 
 ## Default export
 
-The default export is an object with `lookup`, `parse`, `normalizeDomain`, `WhoisPkError` and `ENDPOINT`, for code that does `import whoispk from 'whoispk'`.
+The default export is an object with `lookup`, `parse`, `normalizeDomain`, `expandExtensions`, `EXTENSIONS`, `WhoisPkError` and `ENDPOINT`, for code that does `import whoispk from 'whoispk'`.

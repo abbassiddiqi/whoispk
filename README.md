@@ -27,6 +27,12 @@ npx whoispk yourbrand
 
 `.pk` is added for you. `yourbrand`, `yourbrand.pk` and `https://www.yourbrand.pk/` all look up the same domain, and `.com.pk`, `.org.pk` and the other second-level names work too.
 
+To check a name under every extension at once:
+
+```sh
+npx whoispk --all yourbrand
+```
+
 To have the `whoispk` command always available:
 
 ```sh
@@ -36,6 +42,7 @@ npm install -g whoispk
 ## Features
 
 - **Clear answers.** Each domain is registered, available, or not registrable. For a name PKNIC rejects, you get its reason.
+- **Every extension at once.** `--all` checks a name under `.pk`, `.com.pk`, `.net.pk`, `.org.pk`, `.biz.pk`, `.web.pk` and `.fam.pk`, one line each.
 - **Many domains at once.** Pass several names, or pipe in a list. Lookups run in parallel and print in your order.
 - **Made for scripts.** `--json` output, exit codes you can rely on, and no spinner in piped output.
 - **Also a library.** A promise-based API with TypeScript types, timeouts, retries and cancelling.
@@ -43,6 +50,16 @@ npm install -g whoispk
 - **Watched for breakage.** Tests run every week against the real PKNIC site, so a change to their page gets noticed quickly.
 
 ## Recipes
+
+**Find a free name** across every extension for a few ideas:
+
+```console
+$ whoispk --all chaiwala dhaba
+chaiwala.pk      ● Registered       expires Mar 20, 2027
+chaiwala.com.pk  ● Registered       expires Oct 10, 2030
+chaiwala.net.pk  ● Available
+…
+```
 
 **Check a shortlist of name ideas**, one per line (`#` starts a comment):
 
@@ -77,6 +94,8 @@ for (const name of ['mybrand.pk', 'mybrand.com.pk']) {
 ```
 whoispk [options] <domain...>
 
+  -a, --all              Check every public extension (.pk, .com.pk, .net.pk, …)
+  -s, --short            One line per domain (default with --all)
   -j, --json             Print results as JSON
   -t, --timeout <ms>     Per-request timeout (default: 15000)
   -c, --concurrency <n>  Parallel lookups (default: 3)

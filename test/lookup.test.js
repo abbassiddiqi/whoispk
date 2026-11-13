@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { lookup, normalizeDomain, WhoisPkError, USER_AGENT } from '../src/index.js';
+import { lookup, normalizeDomain, expandExtensions, EXTENSIONS, WhoisPkError, USER_AGENT } from '../src/index.js';
 
 const execFileAsync = promisify(execFile);
 const fixture = (name) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
@@ -18,6 +18,17 @@ test('normalizeDomain', () => {
   for (const bad of ['', '   ', undefined, null, 'https://']) {
     assert.throws(() => normalizeDomain(bad), { code: 'INVALID_INPUT' });
   }
+});
+
+test('expandExtensions', () => {
+  const all = ['magic.pk', 'magic.com.pk', 'magic.net.pk', 'magic.org.pk', 'magic.biz.pk', 'magic.web.pk', 'magic.fam.pk'];
+  assert.deepEqual(expandExtensions('magic'), all);
+  assert.deepEqual(expandExtensions('Magic.PK'), all);
+  assert.deepEqual(expandExtensions('https://www.magic.com.pk/shop'), all);
+  assert.deepEqual(expandExtensions('magic.edu.pk'), all);
+  assert.equal(EXTENSIONS.length, all.length);
+  assert.throws(() => expandExtensions('.pk'), { code: 'INVALID_INPUT' });
+  assert.throws(() => expandExtensions(''), { code: 'INVALID_INPUT' });
 });
 
 test('lookup posts the normalised domain and parses the response', async () => {
