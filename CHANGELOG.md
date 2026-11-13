@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0
+## 2.0.0 (2026-11-14)
 
 Rewritten for PKNIC's current lookup page and for modern Node.js.
 
