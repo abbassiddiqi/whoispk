@@ -77,7 +77,4 @@ Please be gentle with PKNIC's servers. Use fixtures in tests, and don't add loop
 
 ## Releasing (maintainers)
 
-1. Move the changes under a new heading in `CHANGELOG.md` and commit.
-2. Run `npm test && npm run test:live`.
-3. Run `npm version <patch|minor|major>`. This creates the version commit and tag.
-4. Run `git push --follow-tags && npm publish`.
+See [docs/releasing.md](docs/releasing.md). In short: update `CHANGELOG.md`, run `npm version <patch|minor|major>`, `npm publish`, then `git push --follow-tags`.

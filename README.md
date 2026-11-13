@@ -161,6 +161,7 @@ Version 2 needs Node.js 20.19 or later. The callback API is gone; use the promis
 | [API reference](docs/api.md) | `lookup`, `parse`, `normalizeDomain`, result fields, errors |
 | [How it works](docs/how-it-works.md) | How PKNIC's page is read, and what to do when it changes |
 | [Changelog](CHANGELOG.md) | What changed in each release |
+| [Releasing](docs/releasing.md) | How maintainers publish a new version to npm |
 
 ## Contributing
 
