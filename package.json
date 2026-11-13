@@ -34,7 +34,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "test:live": "WHOISPK_LIVE=1 node --test"
+    "test:live": "WHOISPK_LIVE=1 node --test",
+    "fixtures": "node scripts/update-fixtures.js"
   },
   "author": {
     "name": "Abbas Siddiqi",

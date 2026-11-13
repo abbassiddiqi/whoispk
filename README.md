@@ -83,7 +83,7 @@ if (result.available) {
 
 CommonJS works too, on Node 20.19 or later: `const { lookup } = require('whoispk');`
 
-### `lookup(domain, options?) → Promise<LookupResult>`
+`lookup()` resolves to:
 
 ```js
 {
@@ -95,26 +95,20 @@ CommonJS works too, on Node 20.19 or later: `const { lookup } = require('whoispk
   expireDate: '2028-05-14',      // YYYY-MM-DD, or null
   nameservers: ['ns1.alibabadns.cn', 'ns1.alibabadns.com', 'ns2.alibabadns.cn', 'ns2.alibabadns.com'],
   reasons: [],                   // why PKNIC rejected the name, when status is 'invalid'
-  fields: {                      // every labelled field PKNIC showed, verbatim
-    'Domain Name': 'daraz.pk',
-    'Create Date': 'May 14, 2012',
-    'Expire Date': 'May 14, 2028'
-  }
+  fields: { 'Domain Name': 'daraz.pk', 'Create Date': 'May 14, 2012', 'Expire Date': 'May 14, 2028' }
 }
 ```
 
 PKNIC no longer publishes registrant, address or contact details, because of GDPR and ICANN WHOIS policy, so those fields are not returned.
 
-| Option    | Default        | Description                                          |
-| --------- | -------------- | ---------------------------------------------------- |
-| `timeout` | `15000`        | Per-request timeout in ms                            |
-| `retries` | `1`            | Retries on network errors, timeouts, 429 and 5xx     |
-| `signal`  | none           | An `AbortSignal` to cancel the lookup                |
-| `fetch`   | global `fetch` | A custom fetch implementation, for proxies or tests  |
+See the [API reference](docs/api.md) for options (timeout, retries, cancelling, custom fetch), error codes, `parse()` and `normalizeDomain()`.
 
-Failures reject with a `WhoisPkError` that has a `code`. The codes are `INVALID_INPUT`, `HTTP_ERROR`, `NETWORK_ERROR`, `TIMEOUT`, `ABORTED` and `PARSE_ERROR`. `PARSE_ERROR` means PKNIC's page has changed; please [open an issue](https://github.com/abbassiddiqi/whoispk/issues).
+## Documentation
 
-Also exported: `parse(html)` to parse a saved PKNIC response, and `normalizeDomain(input)`.
+- [CLI reference](docs/cli.md): every option, stdin input, JSON output, exit codes and `jq` recipes
+- [API reference](docs/api.md): `lookup`, `parse`, `normalizeDomain`, result fields and errors
+- [How it works](docs/how-it-works.md): how PKNIC's page is read, and what to do when it changes
+- [Changelog](CHANGELOG.md)
 
 ## Upgrading from 1.x
 
@@ -123,12 +117,9 @@ Also exported: `parse(html)` to parse a saved PKNIC response, and `normalizeDoma
 - `isFound` and `data` are replaced by `status`, `registered`, `available` and the flat fields shown above.
 - Dates are ISO `YYYY-MM-DD` strings.
 
-## Development
+## Contributing
 
-```sh
-npm test            # offline tests, using saved PKNIC pages in test/fixtures
-npm run test:live   # also runs the tests against the real pknic.net.pk
-```
+Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests and guidelines. If whoispk reports a `PARSE_ERROR`, PKNIC has probably changed its page; please [open an issue](https://github.com/abbassiddiqi/whoispk/issues).
 
 ## License
 
