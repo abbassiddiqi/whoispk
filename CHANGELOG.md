@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.1.0 (2026-11-14)
 
 - New: `--all` checks a name under every extension anyone can register: `.pk`, `.com.pk`, `.net.pk`, `.org.pk`, `.biz.pk`, `.web.pk` and `.fam.pk`. `whoispk --all chaiwala` and `whoispk --all chaiwala.com.pk` check the same seven domains.
 - New: `-s, --short` prints one line per domain. It's the default with `--all`; `--no-short` brings back the detailed view.
