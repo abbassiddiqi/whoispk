@@ -10,6 +10,6 @@ Rewritten for PKNIC's current lookup page and for modern Node.js.
 - New: TypeScript types, `AbortSignal` support, retries on transient failures, and a `WhoisPkError` with a `code`.
 - Changed: no runtime dependencies. Uses native `fetch` and `util.parseArgs`.
 - Breaking: requires Node.js 20.19 or later. The package is ESM, though `require()` still works.
-- Breaking: the callback API is removed, and the result shape has changed. See "Upgrading from 1.x" in the README.
+- Breaking: the callback API is removed, and the result shape has changed. See the [API reference](docs/api.md#lookupresult) for the new shape.
 - Breaking: registrant and contact fields are gone, because PKNIC no longer publishes them.
 - Tests now use `node:test` with offline fixtures. GitHub Actions replaces Travis CI.
