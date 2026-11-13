@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 (2026-11-14)
+
+- Fixed: the `timeout` option now keeps Node running until it fires. Before, a stalled request could let the process exit early with no error. The timeout also covers reading the response body now.
+
 ## 2.0.0 (2026-11-14)
 
 Rewritten for PKNIC's current lookup page and for modern Node.js.

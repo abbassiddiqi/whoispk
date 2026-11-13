@@ -133,7 +133,7 @@ npm test && npm run test:live
 # In CHANGELOG.md, change "## 2.0.0" to "## 2.0.0 (<today's date>)", then:
 git commit -am "Update changelog for 2.0.0"
 
-git tag v2.0.0
+git tag -a v2.0.0 -m "2.0.0"   # -a: --follow-tags only pushes annotated tags
 npm publish --dry-run
 npm publish
 git push --follow-tags

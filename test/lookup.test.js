@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { lookup, normalizeDomain, WhoisPkError, USER_AGENT } from '../src/index.js';
 
+const execFileAsync = promisify(execFile);
 const fixture = (name) => readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8');
 
 test('normalizeDomain', () => {
@@ -79,6 +82,19 @@ test('lookup reports TIMEOUT', async () => {
   const fetch = (url, { signal }) =>
     new Promise((_, reject) => signal.addEventListener('abort', () => reject(signal.reason)));
   await assert.rejects(lookup('daraz.pk', { fetch, timeout: 20, retries: 0 }), { code: 'TIMEOUT' });
+});
+
+test('the timeout keeps the process alive until it fires', async () => {
+  // Outside the test runner, nothing else holds the event loop open. With an unref'd
+  // timer (AbortSignal.timeout) Node would exit with code 13 before the timeout fired.
+  const script = `
+    import { lookup } from ${JSON.stringify(new URL('../src/index.js', import.meta.url).href)};
+    const fetch = (url, { signal }) =>
+      new Promise((_, reject) => signal.addEventListener('abort', () => reject(signal.reason)));
+    await lookup('daraz.pk', { fetch, timeout: 20, retries: 0 }).catch((err) => console.log(err.code));
+  `;
+  const { stdout } = await execFileAsync(process.execPath, ['--input-type=module', '-e', script]);
+  assert.equal(stdout.trim(), 'TIMEOUT');
 });
 
 test('lookup honours an AbortSignal', async () => {

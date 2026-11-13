@@ -43,12 +43,20 @@ export function normalizeDomain(input) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function request(domain, { endpoint, timeout, signal, fetch: fetchImpl }) {
-  const signals = [AbortSignal.timeout(timeout)];
-  if (signal) signals.push(signal);
+  // A regular (ref'd) timer rather than AbortSignal.timeout(): the latter doesn't keep the
+  // process alive, so a stalled request could let Node exit before the timeout ever fires.
+  const controller = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort(new DOMException(`Timed out after ${timeout} ms`, 'TimeoutError'));
+  }, timeout);
+  const forwardAbort = () => controller.abort(signal.reason);
+  if (signal?.aborted) forwardAbort();
+  else signal?.addEventListener('abort', forwardAbort, { once: true });
 
-  let response;
   try {
-    response = await fetchImpl(endpoint, {
+    const response = await fetchImpl(endpoint, {
       method: 'POST',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
@@ -56,29 +64,33 @@ async function request(domain, { endpoint, timeout, signal, fetch: fetchImpl }) 
         'user-agent': USER_AGENT,
       },
       body: new URLSearchParams({ name: domain }).toString(),
-      signal: AbortSignal.any(signals),
+      signal: controller.signal,
     });
+
+    if (!response.ok) {
+      throw new WhoisPkError(`PKNIC responded with HTTP ${response.status}`, {
+        code: 'HTTP_ERROR',
+        status: response.status,
+      });
+    }
+
+    return await response.text();
   } catch (err) {
+    if (err instanceof WhoisPkError) throw err;
+    if (timedOut) {
+      throw new WhoisPkError(`PKNIC did not respond within ${timeout} ms`, { code: 'TIMEOUT', cause: err });
+    }
     if (signal?.aborted) {
       throw new WhoisPkError('Lookup aborted', { code: 'ABORTED', cause: err });
-    }
-    if (err?.name === 'TimeoutError') {
-      throw new WhoisPkError(`PKNIC did not respond within ${timeout} ms`, { code: 'TIMEOUT', cause: err });
     }
     throw new WhoisPkError(`Could not reach PKNIC: ${err?.cause?.message ?? err?.message ?? err}`, {
       code: 'NETWORK_ERROR',
       cause: err,
     });
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', forwardAbort);
   }
-
-  if (!response.ok) {
-    throw new WhoisPkError(`PKNIC responded with HTTP ${response.status}`, {
-      code: 'HTTP_ERROR',
-      status: response.status,
-    });
-  }
-
-  return response.text();
 }
 
 /**
